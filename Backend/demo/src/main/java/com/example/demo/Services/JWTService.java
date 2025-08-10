@@ -30,4 +30,13 @@ public class JWTService {
 
     }
 
+    public String getUserName(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(secretkey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
+
 }
