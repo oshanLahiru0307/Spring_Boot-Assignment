@@ -31,6 +31,12 @@ public class AuthController {
         return "User registered!";
     }
 
-
+    @PostMapping("/login")
+    public String login(@RequestBody LoginRequest request) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+        );
+        return jwtUtil.getJWTToken(request.getUsername());
+    }
 
 }
