@@ -15,9 +15,9 @@ public class TaskEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String title;
+    private String userName;
+    private String taskName;
     private String description;
-    private boolean completed;
 
     public int getId() {
         return id;
@@ -27,12 +27,20 @@ public class TaskEntity {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
     }
 
     public String getDescription() {
@@ -43,11 +51,4 @@ public class TaskEntity {
         this.description = description;
     }
 
-    public boolean isCompleted() {
-        return completed;
-    }
-
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
-    }
 }

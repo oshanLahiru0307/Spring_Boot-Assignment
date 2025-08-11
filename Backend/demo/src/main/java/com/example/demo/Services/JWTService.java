@@ -42,7 +42,8 @@ public class JWTService {
     }
 
     public String extractUsername(String token) {
-        return Jwts.parser().setSigningKey(secretkey)
+        return Jwts.parser()
+                .setSigningKey(secretkey)
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
