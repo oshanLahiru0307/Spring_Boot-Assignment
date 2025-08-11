@@ -26,6 +26,14 @@ public class TaskService {
     }
 
 
+    public String deleteTask(int id){
+        if (taskRepository.existsById(id)) {
+            taskRepository.deleteById(id);
+            return "Task with ID " + id + " deleted successfully.";
+        } else {
+            return "Task with ID " + id + " does not exist.";
+        }
+    }
 
 
 

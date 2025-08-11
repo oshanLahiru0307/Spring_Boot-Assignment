@@ -26,4 +26,6 @@ public class TaskController {
         TaskEntity task = taskService.save(taskEntity);
         return ResponseEntity.ok(task);
     }
+
+
 }
