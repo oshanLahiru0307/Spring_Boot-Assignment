@@ -2,6 +2,7 @@ package com.example.demo.Controllers;
 
 import com.example.demo.DTO.UserResponse;
 import com.example.demo.Services.UserServices;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,22 +18,21 @@ public class UserController {
     }
 
     @GetMapping("/getAllUsers")
-    public List<UserResponse> getAll() {
-        return userService.getAllUsers();
+    public ResponseEntity<List<UserResponse>> getAll() {
+        return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("/user/{id}")
-    public UserResponse getUserById(@PathVariable int id) {
-        return userService.getAllUsers().stream()
+    public ResponseEntity<UserResponse> getUserById(@PathVariable int id) {
+        return ResponseEntity.ok(userService.getAllUsers().stream()
                 .filter(user -> user.getId() == id)
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found")));
     }
 
-
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable int id) {
+    public ResponseEntity<String> delete(@PathVariable int id) {
         userService.deleteUser(id);
-        return "User deleted!";
+        return ResponseEntity.ok("User deleted!");
     }
 }

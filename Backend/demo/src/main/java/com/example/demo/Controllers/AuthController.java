@@ -4,6 +4,7 @@ import com.example.demo.DTO.LoginRequest;
 import com.example.demo.DTO.RegisterRequest;
 import com.example.demo.Services.JWTService;
 import com.example.demo.Services.UserServices;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,17 +27,17 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
         userService.createUser(request);
-        return "User registered!";
+        return ResponseEntity.ok("User registered successfully!");
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest request) {
+    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
-        return jwtUtil.getJWTToken(request.getUsername());
+        return ResponseEntity.ok(jwtUtil.getJWTToken(request.getUsername()));
     }
 
 }
