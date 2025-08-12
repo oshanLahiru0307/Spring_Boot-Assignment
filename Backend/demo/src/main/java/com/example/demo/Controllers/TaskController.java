@@ -38,6 +38,7 @@ public class TaskController {
         return ResponseEntity.ok(tasks);
     }
 
+
     @PostMapping("/create")
     public ResponseEntity<TaskEntity> create(@RequestBody TaskEntity taskEntity) {
         TaskEntity task = taskService.save(taskEntity);
@@ -63,6 +64,19 @@ public class TaskController {
             return ResponseEntity.status(404).body(null);
         }
     }
+
+    @PatchMapping("/updateTaskStatus/{id}")
+    public ResponseEntity<TaskEntity> updateTaskStatus(@PathVariable int id, @RequestParam String status) {
+        try {
+            TaskEntity updatedTask = taskService.updateTaskStatus(id, status);
+            return ResponseEntity.ok(updatedTask);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(null);
+        }
+    }
+
+
+
 
 
 }

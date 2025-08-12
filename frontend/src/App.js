@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import RegisterPage from '../src/Pages/RegisterPage';
 import Dashbord from '../src/Pages/Dashbord';
 import LoginPage from '../src/Pages/LoginPage';
+import AllTasksPage from '../src/Pages/AllTasksPage';
 
 function App() {
 
@@ -16,6 +17,12 @@ function App() {
             path="/dashboard" 
             element={
                 <Dashbord />
+            } 
+          />
+          <Route 
+            path="/all-tasks" 
+            element={
+                <AllTasksPage />
             } 
           />
         </Routes>
