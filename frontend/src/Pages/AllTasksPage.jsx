@@ -17,11 +17,13 @@ function AllTasksPage() {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
+  const userName = localStorage.getItem('user');
 
   const fetchTasks = async () => {
     try {
       setLoading(true);
-      const response = await TaskService.getAllTasks();
+      console.log("Fetching tasks for user:", userName);
+      const response = await TaskService.getByUserName(userName);
       if (response) {
         setTasks(response);
       } else {

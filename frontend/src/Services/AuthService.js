@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const base_uri = 'http://localhost:4000/auth'
+const base_uri = 'http://localhost:5000/auth'
 
 class AuthService {
 
