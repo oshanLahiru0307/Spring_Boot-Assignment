@@ -1,22 +1,22 @@
-import {proxy} from 'valtio'
+import { proxy } from 'valtio';
 
-let storedUser = null;
+let user = null;
 let token = null;
 
 try {
-  const user = localStorage.getItem("user");
-  const tokenValue = localStorage.getItem("token");
-  storedUser = user ? JSON.parse(user) : null;
-  token = tokenValue ? JSON.parse(tokenValue) : null;
-  console.log("Stored token:", token);
-  console.log("Stored user:", storedUser);
+  const storedUser = localStorage.getItem("user");
+  const storedToken = localStorage.getItem("token");
+
+  user = storedUser;
+  token = storedToken; // Token is likely a string, no need to parse as JSON
+
 } catch (error) {
-  console.error("Error parsing user from localStorage:", error);
+  console.error("Error retrieving or parsing data from localStorage:", error);
 }
 
 const usrState = proxy({
-    user: storedUser,
-    token: token,
-})
+  user: user,
+  token: token,
+});
 
-export default usrState
+export default usrState;

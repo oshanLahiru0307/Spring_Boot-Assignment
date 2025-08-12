@@ -18,10 +18,9 @@ public class TaskEntity {
     private String userName;
     private String taskName;
     private String description;
-    private String status = "pending";
+    private String status;
     private String priority;
     private String dueDate;
-    private String CreatedAt = java.time.LocalDateTime.now().toString();
 
     public int getId() {
         return id;
@@ -79,12 +78,4 @@ public class TaskEntity {
         this.dueDate = dueDate;
     }
 
-
-    public String getCreatedAt() {
-        return CreatedAt;
-    }
-
-    public void setCreatedAt(String createdAt) {
-        CreatedAt = createdAt;
-    }
 }

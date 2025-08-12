@@ -1,151 +1,121 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = 'http://localhost:3001/api/tasks';
+const token = localStorage.getItem('token');
 
-// Create axios instance with default config
-const taskApi = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 10000,
-});
+class TaskService {
 
-// Request interceptor to add auth token
-taskApi.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Response interceptor for error handling
-taskApi.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
-
-export const TaskService = {
-  // Create a new task
-  createTask: async (taskData) => {
+  static async createTask(taskData) {
     try {
-      const response = await taskApi.post('/tasks', taskData);
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+      const response = await axios.post(`${API_BASE_URL}/create`, taskData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      if (!response) {
+        throw new Error('Task failed to save');
+      }
       return response.data;
     } catch (error) {
-      throw error;
-    }
-  },
-
-  // Get all tasks
-  getAllTasks: async () => {
-    try {
-      const response = await taskApi.get('/tasks');
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Get task by ID
-  getTaskById: async (taskId) => {
-    try {
-      const response = await taskApi.get(`/tasks/${taskId}`);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Update task
-  updateTask: async (taskId, taskData) => {
-    try {
-      const response = await taskApi.put(`/tasks/${taskId}`, taskData);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Delete task
-  deleteTask: async (taskId) => {
-    try {
-      const response = await taskApi.delete(`/tasks/${taskId}`);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Update task status
-  updateTaskStatus: async (taskId, status) => {
-    try {
-      const response = await taskApi.patch(`/tasks/${taskId}/status`, { status });
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Get tasks by status
-  getTasksByStatus: async (status) => {
-    try {
-      const response = await taskApi.get(`/tasks/status/${status}`);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Get tasks by priority
-  getTasksByPriority: async (priority) => {
-    try {
-      const response = await taskApi.get(`/tasks/priority/${priority}`);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Get tasks by assignee
-  getTasksByAssignee: async (assignee) => {
-    try {
-      const response = await taskApi.get(`/tasks/assignee/${assignee}`);
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Get tasks due soon (within next 7 days)
-  getTasksDueSoon: async () => {
-    try {
-      const response = await taskApi.get('/tasks/due-soon');
-      return response.data;
-    } catch (error) {
-      throw error;
-    }
-  },
-
-  // Get task statistics
-  getTaskStats: async () => {
-    try {
-      const response = await taskApi.get('/tasks/stats');
-      return response.data;
-    } catch (error) {
+      console.error("Error at create task:", error);
       throw error;
     }
   }
-};
+
+  static async getAllTasks() {
+    try {
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+      const response = await axios.get(`${API_BASE_URL}/getAll`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+      throw error;
+    }
+  }
+
+  static async getTaskById(taskId) {
+    try {
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+      const response = await axios.get(`${API_BASE_URL}/getTaskById/${taskId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching task:", error);
+      throw error;
+    }
+  }
+
+  static async updateTask(taskId, taskData) {
+    try {
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+      const response = await axios.put(`${API_BASE_URL}/update/${taskId}`, taskData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error updating task:", error);
+      throw error;
+    }
+  }
+
+  static async deleteTask(taskId) {
+    try {   
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+      const response = await axios.delete(`${API_BASE_URL}/delete/${taskId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting task:", error);
+      throw error;
+    }
+  }
+
+  static async getByUserName(userName) {
+    try {
+      if (!token) {
+        throw new Error('Authentication token not found. Please login again.');
+      }
+      const response = await axios.get(`${API_BASE_URL}/getByUserName/${userName}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching tasks by username:", error);
+      throw error;
+    }
+  }
+}
 
 export default TaskService;

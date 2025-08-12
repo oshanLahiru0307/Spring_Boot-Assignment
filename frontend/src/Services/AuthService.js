@@ -20,11 +20,12 @@ static async loginUser(credentials) {
         try {
             const response = await axios.post(`${base_uri}/login`, credentials)
             if (response) {
-                const { token, user } = response.data;
+                
+                const { token, username } = response.data;
                 
                 // Store token and user separately
                 localStorage.setItem('token', token);
-                localStorage.setItem('user', JSON.stringify(user));
+                localStorage.setItem('user', username);
                 
                 console.log("Login successful:", response.data);
                 console.log("Token:", response.data.token);
@@ -42,12 +43,13 @@ static async loginUser(credentials) {
 
     // Helper methods to get stored data
     static getToken() {
+        console.log()
         return localStorage.getItem('token');
     }
 
     static getUser() {
-        const userStr = localStorage.getItem('user');
-        return userStr ? JSON.parse(userStr) : null;
+       return localStorage.getItem('user');
+
     }
 
     static isAuthenticated() {

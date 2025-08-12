@@ -12,7 +12,7 @@ const NavBar = () => {
     localStorage.removeItem('token');
     usrState.user = null;
     usrState.token = null;
-    navigate('/login');
+    navigate('/');
   };
 
   const getUserInitial = () => {

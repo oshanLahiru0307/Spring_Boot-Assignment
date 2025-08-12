@@ -2,28 +2,31 @@ import React, { useState } from 'react';
 import { Modal, Form, Input, Select, DatePicker, Button, message, Spin } from 'antd';
 import { PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import TaskService from '../Services/TaskServices';
+import AuthService from '../Services/AuthService';
+
 
 const { TextArea } = Input;
 const { Option } = Select;
 
 const CreateTaskModal = ({ visible, onCancel, onSuccess }) => {
+
+
+  const user = AuthService.getUser()
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (values) => {
     try {
       setLoading(true);
-      
       // Format the date for backend
       const formattedValues = {
         ...values,
+        userName: user,
         dueDate: values.dueDate ? values.dueDate.format('YYYY-MM-DD') : null,
         status: 'Pending', // Default status for new tasks
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
       };
 
-
+      console.log("Form values:", formattedValues);
 
       // Make API call to create task using TaskService
       const newTask = await TaskService.createTask(formattedValues);
@@ -36,23 +39,8 @@ const CreateTaskModal = ({ visible, onCancel, onSuccess }) => {
       console.error('Error creating task:', error);
       
       if (error.response) {
-        // Server responded with error
-        if (error.response.status === 401) {
-          message.error('Authentication failed. Please login again.');
-        } else if (error.response.status === 400) {
-          message.error('Invalid data. Please check your input.');
-        } else if (error.response.status === 500) {
-          message.error('Server error. Please try again later.');
-        } else {
           message.error(`Error: ${error.response.data?.message || 'Failed to create task'}`);
         }
-      } else if (error.request) {
-        // Network error
-        message.error('Network error. Please check your connection.');
-      } else {
-        // Other error
-        message.error('An unexpected error occurred.');
-      }
     } finally {
       setLoading(false);
     }
@@ -89,7 +77,7 @@ const CreateTaskModal = ({ visible, onCancel, onSuccess }) => {
         className="mt-4"
       >
         <Form.Item
-          name="title"
+          name="taskName"
           label="Task Title"
           rules={[
             { required: true, message: 'Please enter task title' },
