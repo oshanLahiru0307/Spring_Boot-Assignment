@@ -41,8 +41,7 @@ public class AuthController {
         
         String token = jwtUtil.getJWTToken(request.getUsername());
         String user = request.getUsername();
-        
-        //LoginResponse response = new LoginResponse(token, user);
+
         HashMap<String,String> res = new HashMap<String, String>();
         res.put("token", token);
         res.put("username", user);
