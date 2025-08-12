@@ -20,7 +20,7 @@ public class UserDetailsServices implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity user = userRepository.findByUsername(username);
+        UserEntity user = userRepository.findByUsername(username).orElse(null);
         return User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())

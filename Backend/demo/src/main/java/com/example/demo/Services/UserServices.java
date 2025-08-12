@@ -43,5 +43,10 @@ public class UserServices {
         repository.deleteById(id);
     }
 
+    public UserResponse findUserByUsername(String username) {
+        UserEntity user = repository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return new UserResponse(user.getId(), user.getName(), user.getUsername(), user.getEmail());
+    }
 
 }

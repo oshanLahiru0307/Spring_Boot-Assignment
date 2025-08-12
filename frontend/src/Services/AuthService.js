@@ -20,9 +20,15 @@ static async loginUser(credentials) {
         try {
             const response = await axios.post(`${base_uri}/login`, credentials)
             if (response) {
-                //authStore.setUser(response.data);
-                localStorage.setItem('token', JSON.stringify(response.data));
+                const { token, user } = response.data;
+                
+                // Store token and user separately
+                localStorage.setItem('token', token);
+                localStorage.setItem('user', JSON.stringify(user));
+                
                 console.log("Login successful:", response.data);
+                console.log("Token:", response.data.token);
+                console.log("User:", response.data.username);
             } else {
                 throw new Error('Login failed');
             }
@@ -32,6 +38,25 @@ static async loginUser(credentials) {
             throw error;
         }
 
+    }
+
+    // Helper methods to get stored data
+    static getToken() {
+        return localStorage.getItem('token');
+    }
+
+    static getUser() {
+        const userStr = localStorage.getItem('user');
+        return userStr ? JSON.parse(userStr) : null;
+    }
+
+    static isAuthenticated() {
+        return !!this.getToken();
+    }
+
+    static logout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
     }
 
 }

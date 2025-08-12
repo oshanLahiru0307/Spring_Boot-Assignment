@@ -1,6 +1,7 @@
 package com.example.demo.Controllers;
 
 import com.example.demo.DTO.LoginRequest;
+import com.example.demo.DTO.LoginResponse;
 import com.example.demo.DTO.RegisterRequest;
 import com.example.demo.Services.JWTService;
 import com.example.demo.Services.UserServices;
@@ -8,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 
 @RestController
 @RequestMapping(value = "/auth")
@@ -31,11 +34,19 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<HashMap<String, String>> login(@RequestBody LoginRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
-        return ResponseEntity.ok(jwtUtil.getJWTToken(request.getUsername()));
+        
+        String token = jwtUtil.getJWTToken(request.getUsername());
+        String user = request.getUsername();
+        
+        //LoginResponse response = new LoginResponse(token, user);
+        HashMap<String,String> res = new HashMap<String, String>();
+        res.put("token", token);
+        res.put("username", user);
+        return ResponseEntity.ok(res);
     }
 
 }
