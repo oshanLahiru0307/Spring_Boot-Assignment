@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+
 @RestController
-@RequestMapping(value = "/api/tasks")
+@RequestMapping(value = "/api/task")
 @CrossOrigin
 public class TaskController {
 
@@ -40,7 +41,7 @@ public class TaskController {
     }
 
 
-    @PostMapping("/create")
+    @PostMapping("/createTask")
     public ResponseEntity<TaskEntity> create(@RequestBody TaskEntity taskEntity) {
         TaskEntity task = taskService.save(taskEntity);
         return ResponseEntity.ok(task);

@@ -1,113 +1,117 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button, message, Popconfirm } from 'antd';
+import { PlusOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import NavBar from '../Components/NavBar';
+import TaskManager from '../Components/TaskManager';
+import CreateTaskModal from '../Components/CreateTaskModal';
+import EditTaskModal from '../Components/EditTaskModal';
+import TaskDetailModal from '../Components/TaskDetailModal';
+import TaskService from '../Services/TaskServices';
 
 function AllTasksPage() {
   const navigate = useNavigate();
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      title: "Complete Project Documentation",
-      description: "Write comprehensive documentation for the new feature",
-      status: "In Progress",
-      priority: "High",
-      dueDate: "2024-01-15",
-      assignedTo: "John Doe"
-    },
-    {
-      id: 2,
-      title: "Review Code Changes",
-      description: "Review pull request #123 for the authentication module",
-      status: "Completed",
-      priority: "Medium",
-      dueDate: "2024-01-10",
-      assignedTo: "Jane Smith"
-    },
-    {
-      id: 3,
-      title: "Update User Interface",
-      description: "Redesign the dashboard layout based on user feedback",
-      status: "Pending",
-      priority: "High",
-      dueDate: "2024-01-20",
-      assignedTo: "Mike Johnson"
-    },
-    {
-      id: 4,
-      title: "Fix Bug in Login System",
-      description: "Resolve the authentication timeout issue",
-      status: "In Progress",
-      priority: "Critical",
-      dueDate: "2024-01-12",
-      assignedTo: "Sarah Wilson"
-    },
-    {
-      id: 5,
-      title: "Prepare Team Meeting",
-      description: "Organize weekly team sync and prepare agenda",
-      status: "Completed",
-      priority: "Low",
-      dueDate: "2024-01-08",
-      assignedTo: "Alex Brown"
-    },
-    {
-      id: 6,
-      title: "Database Optimization",
-      description: "Optimize database queries for better performance",
-      status: "Pending",
-      priority: "Medium",
-      dueDate: "2024-01-25",
-      assignedTo: "David Lee"
-    }
-  ]);
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [createModalVisible, setCreateModalVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [detailModalVisible, setDetailModalVisible] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Completed':
-        return 'bg-green-500/20 text-green-400 border-green-500/30';
-      case 'In Progress':
-        return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
-      case 'Pending':
-        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-      default:
-        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+  const fetchTasks = async () => {
+    try {
+      setLoading(true);
+      const response = await TaskService.getAllTasks();
+      if (response) {
+        setTasks(response);
+      } else {
+        console.error('Failed to fetch tasks');
+        message.error('Failed to fetch tasks');
+      }
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+      message.error('Error fetching tasks. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getPriorityColor = (priority) => {
-    switch (priority) {
-      case 'Critical':
-        return 'bg-red-500/20 text-red-400 border-red-500/30';
-      case 'High':
-        return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
-      case 'Medium':
-        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-      case 'Low':
-        return 'bg-green-500/20 text-green-400 border-green-500/30';
-      default:
-        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+  const handleCreateTask = async (newTask) => {
+    try {
+      await fetchTasks(); // Refresh the task list
+      message.success('Task created successfully!');
+    } catch (error) {
+      console.error('Error creating task:', error);
     }
   };
+
+  const handleEditTask = (task) => {
+    setSelectedTask(task);
+    setEditModalVisible(true);
+  };
+
+  const handleViewTask = (task) => {
+    setSelectedTask(task);
+    setDetailModalVisible(true);
+  };
+
+  const handleDeleteTask = async (taskId) => {
+    try {
+      await TaskService.deleteTask(taskId);
+      await fetchTasks(); // Refresh the task list
+      message.success('Task deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting task:', error);
+      message.error('Failed to delete task. Please try again.');
+    }
+  };
+
+  const handleUpdateTask = async (updatedTask) => {
+    try {
+      await fetchTasks(); // Refresh the task list
+      message.success('Task updated successfully!');
+    } catch (error) {
+      console.error('Error updating task:', error);
+    }
+  };
+
+  const handleRefresh = () => {
+    fetchTasks();
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-20 px-4'>
-      <NavBar/>
+      <NavBar />
       <div className='max-w-7xl mx-auto'>
         {/* Header */}
         <div className='mb-8'>
           <div className='flex items-center justify-between mb-6'>
             <h1 className='text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent'>
-              All Tasks
+              Task Management
             </h1>
-            <button
-              onClick={() => navigate('/dashboard')}
-              className='bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 text-white font-medium py-2 px-4 rounded-lg transition-all duration-200 flex items-center space-x-2'
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              <span>Back to Dashboard</span>
-            </button>
+            <div className='flex items-center space-x-4'>
+              <Button
+                onClick={() => setCreateModalVisible(true)}
+                type="primary"
+                icon={<PlusOutlined />}
+                size="large"
+                className="bg-gradient-to-r from-green-500 to-green-600 border-0 hover:from-green-600 hover:to-green-700 rounded-lg"
+              >
+                Create Task
+              </Button>
+              <Button
+                onClick={() => navigate('/dashboard')}
+                icon={<ArrowLeftOutlined />}
+                size="large"
+                className="bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 text-white border-0 rounded-lg"
+              >
+                Back to Dashboard
+              </Button>
+            </div>
           </div>
           
           {/* Stats Summary */}
@@ -131,63 +135,49 @@ function AllTasksPage() {
           </div>
         </div>
 
-        {/* Tasks Grid */}
-        <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6'>
-          {tasks.map((task) => (
-            <div key={task.id} className='bg-gradient-to-r from-gray-800 to-gray-700 rounded-xl shadow-lg border border-gray-600 p-6 hover:shadow-xl transition-all duration-200 transform hover:scale-105'>
-              <div className='flex items-start justify-between mb-4'>
-                <h3 className='text-lg font-semibold text-white mb-2'>{task.title}</h3>
-                <div className='flex space-x-2'>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStatusColor(task.status)}`}>
-                    {task.status}
-                  </span>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getPriorityColor(task.priority)}`}>
-                    {task.priority}
-                  </span>
-                </div>
-              </div>
-              
-              <p className='text-gray-300 text-sm mb-4 line-clamp-2'>{task.description}</p>
-              
-              <div className='space-y-2 mb-4'>
-                <div className='flex items-center text-sm text-gray-400'>
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                  {task.assignedTo}
-                </div>
-                <div className='flex items-center text-sm text-gray-400'>
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  Due: {task.dueDate}
-                </div>
-              </div>
-              
-              <div className='flex space-x-2'>
-                <button className='flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white text-sm font-medium py-2 px-3 rounded-lg transition-all duration-200'>
-                  Edit
-                </button>
-                <button className='flex-1 bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white text-sm font-medium py-2 px-3 rounded-lg transition-all duration-200'>
-                  View Details
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+        {/* Task Manager Component */}
+        <TaskManager
+          tasks={tasks}
+          setTasks={setTasks}
+          onEditTask={handleEditTask}
+          onViewTask={handleViewTask}
+          onDeleteTask={handleDeleteTask}
+          onRefresh={handleRefresh}
+          loading={loading}
+        />
 
-        {/* Empty State */}
-        {tasks.length === 0 && (
-          <div className='text-center py-12'>
-            <div className='w-24 h-24 bg-gradient-to-r from-gray-600 to-gray-700 rounded-full flex items-center justify-center mx-auto mb-4'>
-              <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-            </div>
-            <h3 className='text-xl font-semibold text-gray-300 mb-2'>No tasks found</h3>
-            <p className='text-gray-400'>Create your first task to get started</p>
-          </div>
-        )}
+        {/* Create Task Modal */}
+        <CreateTaskModal
+          visible={createModalVisible}
+          onCancel={() => setCreateModalVisible(false)}
+          onSuccess={handleCreateTask}
+        />
+
+        {/* Edit Task Modal */}
+        <EditTaskModal
+          visible={editModalVisible}
+          task={selectedTask}
+          onCancel={() => {
+            setEditModalVisible(false);
+            setSelectedTask(null);
+          }}
+          onSuccess={handleUpdateTask}
+        />
+
+        {/* Task Detail Modal */}
+        <TaskDetailModal
+          visible={detailModalVisible}
+          task={selectedTask}
+          onCancel={() => {
+            setDetailModalVisible(false);
+            setSelectedTask(null);
+          }}
+          onEdit={(task) => {
+            setDetailModalVisible(false);
+            handleEditTask(task);
+          }}
+          onDelete={handleDeleteTask}
+        />
       </div>
     </div>
   );

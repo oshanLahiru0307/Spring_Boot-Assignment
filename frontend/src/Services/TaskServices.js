@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3001/api/tasks';
+const API_BASE_URL = 'http://localhost:4000/api/task';
 const token = localStorage.getItem('token');
 
 class TaskService {
@@ -10,11 +10,11 @@ class TaskService {
       if (!token) {
         throw new Error('Authentication token not found. Please login again.');
       }
-      const response = await axios.post(`${API_BASE_URL}/create`, taskData, {
+      const response = await axios.post(`${API_BASE_URL}/createTask`, taskData, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+        },
       });
       if (!response) {
         throw new Error('Task failed to save');
@@ -33,8 +33,7 @@ class TaskService {
       }
       const response = await axios.get(`${API_BASE_URL}/getAll`, {
         headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Authorization': `Bearer ${token}`
         }
       });
       return response.data;
@@ -51,8 +50,7 @@ class TaskService {
       }
       const response = await axios.get(`${API_BASE_URL}/getTaskById/${taskId}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Authorization': `Bearer ${token}`,
         }
       });
       return response.data;
@@ -69,8 +67,7 @@ class TaskService {
       }
       const response = await axios.put(`${API_BASE_URL}/update/${taskId}`, taskData, {
         headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Authorization': `Bearer ${token}`,
         }
       });
       return response.data;
@@ -87,8 +84,7 @@ class TaskService {
       }
       const response = await axios.delete(`${API_BASE_URL}/delete/${taskId}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Authorization': `Bearer ${token}`,
         }
       });
 
@@ -106,8 +102,7 @@ class TaskService {
       }
       const response = await axios.get(`${API_BASE_URL}/getByUserName/${userName}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Authorization': `Bearer ${token}`,
         }
       });
       return response.data;

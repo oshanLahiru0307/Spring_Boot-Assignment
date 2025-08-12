@@ -1,22 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button, message } from 'antd';
+import { PlusOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import NavBar from '../Components/NavBar';
 import CreateTaskModal from '../Components/CreateTaskModal';
+import TaskAnalytics from '../Components/TaskAnalytics';
+import TaskService from '../Services/TaskServices';
 
 function Dashbord() {
   const navigate = useNavigate();
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleCreateTaskSuccess = (newTask) => {
-    // You can update your dashboard stats here or refresh data
-    console.log('New task created:', newTask);
-    // Optionally refresh dashboard data or update stats
+  const fetchTasks = async () => {
+    try {
+      setLoading(true);
+      const response = await TaskService.getAllTasks();
+      if (response) {
+        setTasks(response);
+      }
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+      message.error('Error fetching tasks. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const handleCreateTaskSuccess = async (newTask) => {
+    try {
+      await fetchTasks(); // Refresh the task list
+      message.success('Task created successfully!');
+    } catch (error) {
+      console.error('Error creating task:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(task => task.status === 'Completed').length;
+  const inProgressTasks = tasks.filter(task => task.status === 'In Progress').length;
+  const pendingTasks = tasks.filter(task => task.status === 'Pending').length;
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-20 px-4'>
-      <NavBar/>
-      <div className='max-w-4xl mx-auto'>
+      <NavBar />
+      <div className='max-w-7xl mx-auto'>
         
         {/* Welcome Card */}
         <div className='bg-gradient-to-r from-gray-800 to-gray-700 rounded-2xl shadow-2xl p-8 mb-8 border border-gray-600'>
@@ -32,12 +65,12 @@ function Dashbord() {
         </div>
 
         {/* Stats Grid */}
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-6 mb-8'>
+        <div className='grid grid-cols-1 md:grid-cols-4 gap-6 mb-8'>
           <div className='bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-6 shadow-lg border border-blue-500/30'>
             <div className='flex items-center justify-between'>
               <div>
                 <p className='text-blue-100 text-sm font-medium'>Total Tasks</p>
-                <p className='text-2xl font-bold text-white'>24</p>
+                <p className='text-2xl font-bold text-white'>{totalTasks}</p>
               </div>
               <div className='w-12 h-12 bg-blue-500/30 rounded-lg flex items-center justify-center'>
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -47,13 +80,13 @@ function Dashbord() {
             </div>
           </div>
 
-          <div className='bg-gradient-to-br from-purple-600 to-purple-700 rounded-xl p-6 shadow-lg border border-purple-500/30'>
+          <div className='bg-gradient-to-br from-green-600 to-green-700 rounded-xl p-6 shadow-lg border border-green-500/30'>
             <div className='flex items-center justify-between'>
               <div>
-                <p className='text-purple-100 text-sm font-medium'>Completed</p>
-                <p className='text-2xl font-bold text-white'>18</p>
+                <p className='text-green-100 text-sm font-medium'>Completed</p>
+                <p className='text-2xl font-bold text-white'>{completedTasks}</p>
               </div>
-              <div className='w-12 h-12 bg-purple-500/30 rounded-lg flex items-center justify-center'>
+              <div className='w-12 h-12 bg-green-500/30 rounded-lg flex items-center justify-center'>
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
@@ -61,37 +94,57 @@ function Dashbord() {
             </div>
           </div>
 
-          <div className='bg-gradient-to-br from-green-600 to-green-700 rounded-xl p-6 shadow-lg border border-green-500/30'>
+          <div className='bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-6 shadow-lg border border-blue-500/30'>
             <div className='flex items-center justify-between'>
               <div>
-                <p className='text-green-100 text-sm font-medium'>In Progress</p>
-                <p className='text-2xl font-bold text-white'>6</p>
+                <p className='text-blue-100 text-sm font-medium'>In Progress</p>
+                <p className='text-2xl font-bold text-white'>{inProgressTasks}</p>
               </div>
-              <div className='w-12 h-12 bg-green-500/30 rounded-lg flex items-center justify-center'>
+              <div className='w-12 h-12 bg-blue-500/30 rounded-lg flex items-center justify-center'>
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
             </div>
           </div>
+
+          <div className='bg-gradient-to-br from-yellow-600 to-yellow-700 rounded-xl p-6 shadow-lg border border-yellow-500/30'>
+            <div className='flex items-center justify-between'>
+              <div>
+                <p className='text-yellow-100 text-sm font-medium'>Pending</p>
+                <p className='text-2xl font-bold text-white'>{pendingTasks}</p>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        {/* Task Analytics */}
+        <div className='mb-8'>
+          <TaskAnalytics tasks={tasks} />
         </div>
 
         {/* Quick Actions */}
         <div className='bg-gradient-to-r from-gray-800 to-gray-700 rounded-2xl shadow-2xl p-8 border border-gray-600'>
           <h3 className='text-xl font-semibold text-white mb-6'>Quick Actions</h3>
           <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                         <button 
-               onClick={() => setIsCreateModalVisible(true)}
-               className='bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl'
-             >
-               Create New Task
-             </button>
-                         <button 
-               onClick={() => navigate('/all-tasks')}
-               className='bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-medium py-3 px-6 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl'
-             >
-               View All Tasks
-             </button>
+            <Button
+              onClick={() => setIsCreateModalVisible(true)}
+              type="primary"
+              icon={<PlusOutlined />}
+              size="large"
+              className="bg-gradient-to-r from-blue-500 to-blue-600 border-0 hover:from-blue-600 hover:to-blue-700 h-12 text-lg rounded-xl"
+            >
+              Create New Task
+            </Button>
+            <Button
+              onClick={() => navigate('/all-tasks')}
+              icon={<ArrowRightOutlined />}
+              size="large"
+              className="bg-gradient-to-r from-purple-500 to-purple-600 border-0 hover:from-purple-600 hover:to-purple-700 text-white h-12 text-lg rounded-xl"
+            >
+              View All Tasks
+            </Button>
           </div>
         </div>
       </div>

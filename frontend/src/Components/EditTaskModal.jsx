@@ -1,47 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Form, Input, Select, DatePicker, Button, message } from 'antd';
-import { PlusOutlined, SaveOutlined } from '@ant-design/icons';
+import { EditOutlined, SaveOutlined } from '@ant-design/icons';
 import TaskService from '../Services/TaskServices';
-import AuthService from '../Services/AuthService'; 
+import dayjs from 'dayjs';
 
 const { TextArea } = Input;
 const { Option } = Select;
 
-const CreateTaskModal = ({ visible, onCancel, onSuccess }) => {
-
+const EditTaskModal = ({ visible, task, onCancel, onSuccess }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (visible && task) {
+      form.setFieldsValue({
+        taskName: task.title || task.taskName,
+        description: task.description,
+        priority: task.priority,
+        status: task.status,
+        dueDate: task.dueDate ? dayjs(task.dueDate) : null,
+        assignedTo: task.assignedTo,
+      });
+    }
+  }, [visible, task, form]);
 
   const handleSubmit = async (values) => {
     try {
       setLoading(true);
-      const user = AuthService.getUser();
-      if (!user) {
-        // Handle case where user is not logged in
-        message.error('You must be logged in to create a task.');
-        return;
-      }
+      
       // Format the date for backend
       const formattedValues = {
         ...values,
-        userName: user,
         dueDate: values.dueDate ? values.dueDate.format('YYYY-MM-DD') : null,
-        status: values.status || 'Pending', // Use form status or default to Pending
       };
 
       console.log("Form values:", formattedValues);
 
-      // Make API call to create task using TaskService
-      const newTask = await TaskService.createTask(formattedValues);
+      // Make API call to update task using TaskService
+      const updatedTask = await TaskService.updateTask(task.id, formattedValues);
       
-      message.success('Task created successfully!');
-      form.resetFields();
-      onSuccess(newTask); // Pass the new task data back
+      message.success('Task updated successfully!');
+      onSuccess(updatedTask); // Pass the updated task data back
       onCancel(); // Close the modal
     } catch (error) {
-      console.error('Error creating task:', error);
+      console.error('Error updating task:', error);
       if (error.response) {
-          message.error(`Error: ${error.response.data?.message || 'Failed to create task'}`);
+        message.error(`Error: ${error.response.data?.message || 'Failed to update task'}`);
       } else {
         message.error(`Error: ${error.message || 'An unexpected error occurred.'}`);
       }
@@ -59,25 +63,21 @@ const CreateTaskModal = ({ visible, onCancel, onSuccess }) => {
     <Modal
       title={
         <div className="flex items-center space-x-2">
-          <PlusOutlined className="text-blue-500" />
-          <span className="text-lg font-semibold">Create New Task</span>
+          <EditOutlined className="text-blue-500" />
+          <span className="text-lg font-semibold">Edit Task</span>
         </div>
       }
       open={visible}
       onCancel={handleCancel}
       footer={null}
       width={600}
-      className="create-task-modal"
+      className="edit-task-modal"
       destroyOnClose
     >
       <Form
         form={form}
         layout="vertical"
         onFinish={handleSubmit}
-        initialValues={{
-          priority: 'Medium',
-          status: 'Pending'
-        }}
         className="mt-4"
       >
         <Form.Item
@@ -112,7 +112,7 @@ const CreateTaskModal = ({ visible, onCancel, onSuccess }) => {
           />
         </Form.Item>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <Form.Item
             name="priority"
             label="Priority"
@@ -137,7 +137,9 @@ const CreateTaskModal = ({ visible, onCancel, onSuccess }) => {
               <Option value="Completed">Completed</Option>
             </Select>
           </Form.Item>
+        </div>
 
+        <div className="grid grid-cols-2 gap-4">
           <Form.Item
             name="dueDate"
             label="Due Date"
@@ -148,6 +150,18 @@ const CreateTaskModal = ({ visible, onCancel, onSuccess }) => {
               className="w-full rounded-lg"
               format="YYYY-MM-DD"
               placeholder="Select due date"
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="assignedTo"
+            label="Assigned To"
+            rules={[{ required: true, message: 'Please enter assignee' }]}
+          >
+            <Input 
+              placeholder="Enter assignee name" 
+              size="large"
+              className="rounded-lg"
             />
           </Form.Item>
         </div>
@@ -169,7 +183,7 @@ const CreateTaskModal = ({ visible, onCancel, onSuccess }) => {
               icon={<SaveOutlined />}
               className="rounded-lg px-6 bg-gradient-to-r from-blue-500 to-blue-600 border-0 hover:from-blue-600 hover:to-blue-700"
             >
-              {loading ? 'Creating...' : 'Create Task'}
+              {loading ? 'Updating...' : 'Update Task'}
             </Button>
           </div>
         </Form.Item>
@@ -178,4 +192,4 @@ const CreateTaskModal = ({ visible, onCancel, onSuccess }) => {
   );
 };
 
-export default CreateTaskModal;
+export default EditTaskModal;

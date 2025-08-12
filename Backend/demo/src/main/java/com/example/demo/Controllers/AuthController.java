@@ -41,10 +41,11 @@ public class AuthController {
         
         String token = jwtUtil.getJWTToken(request.getUsername());
         String user = request.getUsername();
-
+        String email = userService.findUserByUsername(user).getEmail();
         HashMap<String,String> res = new HashMap<String, String>();
         res.put("token", token);
         res.put("username", user);
+        res.put("email", email);
         return ResponseEntity.ok(res);
     }
 

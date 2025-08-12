@@ -1,23 +1,22 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/newlogo.png';
-import usrState from '../Stores/UserState';
+
 
 const NavBar = () => {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const username = localStorage.getItem('user')
 
   const handleLogout = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    usrState.user = null;
-    usrState.token = null;
     navigate('/');
   };
 
   const getUserInitial = () => {
-    if (usrState.user && usrState.user.name) {
-      return usrState.user.name.charAt(0).toUpperCase();
+    if (username) {
+      return username.charAt(0).toUpperCase();
     }
     return 'U';
   };
@@ -68,8 +67,7 @@ const NavBar = () => {
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-gradient-to-b from-gray-800 to-gray-900 rounded-lg shadow-2xl py-1 z-50 border border-gray-700">
                   <div className="px-4 py-3 text-sm text-gray-300 border-b border-gray-700">
-                    <p className="font-medium text-white">{usrState.user?.name || 'User'}</p>
-                    <p className="text-gray-400">{usrState.user?.email || 'user@example.com'}</p>
+                    <p className="font-medium text-white">{username || 'User'}</p>
                   </div>
                   <button
                     onClick={() => {
