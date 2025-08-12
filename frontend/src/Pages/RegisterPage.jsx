@@ -1,183 +1,138 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Form, Input, Button, Card, message, Typography, Divider } from 'antd';
-import { UserOutlined, LockOutlined, MailOutlined, IdcardOutlined } from '@ant-design/icons';
-import { useSnapshot } from 'valtio';
-import { authStore } from '../stores/authStore';
-import { authService } from '../services/authService';
+import React, { useState } from "react";
+import {useNavigate} from 'react-router-dom'
+import { Form, Button, Input, Typography, Row, Col, message} from "antd";
+import AuthService from "../Services/AuthService"
+import backImage1 from "../assets/backimage1.jpg"
+import backImage2 from "../assets/backImage2.jpg"
 
 const { Title, Text } = Typography;
 
-function RegisterPage() {
-  const navigate = useNavigate();
-  const [form] = Form.useForm();
-  const snap = useSnapshot(authStore);
-  const [confirmPassword, setConfirmPassword] = useState('');
+const RegisterPage= () => {
+    const navigate = useNavigate()
+    const [form] = Form.useForm();
+    const [loading, setLoading] = useState(false)
 
-  const onFinish = async (values) => {
-    try {
-      // Check if passwords match
-      if (values.password !== confirmPassword) {
-        message.error('Passwords do not match!');
-        return;
-      }
+    const handleRegister = async (values) => {
+        try {
+            setLoading(true)
+            const response = await AuthService.registerUser(values);
+            setLoading(false)
+            console.log(response)
+            navigate('/login')
+        } catch (error) {
+            console.error(error)
+            message.error("Failed to Register User. Try again later!")
+        }
+    };
 
-      // Call registration service
-      await authService.register({
-        name: values.name,
-        username: values.username,
-        email: values.email,
-        password: values.password
-      });
+    return (
 
-      message.success('Registration successful! Please login.');
-      navigate('/');
-    } catch (error) {
-      // Error is already set in the store
-      console.error('Registration error:', error);
-    }
-  };
 
-  const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-xl">
-        <div className="text-center mb-6">
-          <Title level={2} className="text-gray-800 mb-2">
-            Create Account
-          </Title>
-          <Text type="secondary">
-            Join us and start managing your tasks efficiently
-          </Text>
-        </div>
-
-        <Form
-          form={form}
-          name="register"
-          onFinish={onFinish}
-          onFinishFailed={onFinishFailed}
-          layout="vertical"
-          size="large"
-        >
-          <Form.Item
-            name="name"
-            label="Full Name"
-            rules={[
-              { required: true, message: 'Please enter your full name!' },
-              { min: 2, message: 'Name must be at least 2 characters!' }
-            ]}
-          >
-            <Input
-              prefix={<IdcardOutlined className="text-gray-400" />}
-              placeholder="Enter your full name"
+<div
+style={{
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100vh",
+    background: `url(${backImage1})`,
+    backgroundSize: "cover",
+}}
+>
+<div
+    style={{
+        width: '1200px',
+        padding: "0",
+        borderRadius: "10px",
+        overflow: "hidden",
+        background: "white",
+    }}
+>
+    <Row style={{ height: "550px" }}>
+        {/* Left Side - Image */}
+        <Col span={12} style={{ background: "#1890ff", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <img
+                src={backImage2}
+                alt="Register"
+                style={{ width: "100%", height: "100%", objectFit: "cover", position: "relative" }}
             />
-          </Form.Item>
-
-          <Form.Item
-            name="username"
-            label="Username"
-            rules={[
-              { required: true, message: 'Please enter a username!' },
-              { min: 3, message: 'Username must be at least 3 characters!' },
-              { pattern: /^[a-zA-Z0-9_]+$/, message: 'Username can only contain letters, numbers, and underscores!' }
-            ]}
-          >
-            <Input
-              prefix={<UserOutlined className="text-gray-400" />}
-              placeholder="Choose a username"
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="email"
-            label="Email"
-            rules={[
-              { required: true, message: 'Please enter your email!' },
-              { type: 'email', message: 'Please enter a valid email!' }
-            ]}
-          >
-            <Input
-              prefix={<MailOutlined className="text-gray-400" />}
-              placeholder="Enter your email address"
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="password"
-            label="Password"
-            rules={[
-              { required: true, message: 'Please enter a password!' },
-              { min: 6, message: 'Password must be at least 6 characters!' },
-              { 
-                pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-                message: 'Password must contain at least one lowercase letter, one uppercase letter, and one number!'
-              }
-            ]}
-          >
-            <Input.Password
-              prefix={<LockOutlined className="text-gray-400" />}
-              placeholder="Create a strong password"
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="confirmPassword"
-            label="Confirm Password"
-            rules={[
-              { required: true, message: 'Please confirm your password!' },
-              {
-                validator: (_, value) => {
-                  if (!value || form.getFieldValue('password') === value) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(new Error('Passwords do not match!'));
-                }
-              }
-            ]}
-          >
-            <Input.Password
-              prefix={<LockOutlined className="text-gray-400" />}
-              placeholder="Confirm your password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-          </Form.Item>
-
-          {snap.error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-              <Text type="danger">{snap.error}</Text>
+            <div style={{ color: "white", textAlign: "center", position: "absolute", padding: "20px", bottom: "40%" }}>
+                <Title level={1} style={{ color: "white", textAlign: "center", marginBottom:'30px' }}>
+                    Welcome to Share Me 
+                </Title>
+                <Title level={5} style={{ color: "white", textAlign: "center" }}>
+                    Lorem ipsum is a dummy or placeholder text commonly used in graphic design, publishing, and web development to fill empty spaces in a layout that does not yet have content.
+                </Title>
             </div>
-          )}
+        </Col>
 
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              className="w-full h-12 text-base font-medium"
-              loading={snap.isLoading}
-            >
-              {snap.isLoading ? 'Creating Account...' : 'Create Account'}
-            </Button>
-          </Form.Item>
-        </Form>
+        {/* Right Side - Form */}
+        <Col span={12} style={{ padding: "10px 20px" }}>
+            <Title level={3} style={{ color: "#1890ff", textAlign: "center" }}>
+                Create an Account
+            </Title>
+            <Text type="secondary" style={{ display: "block", textAlign: "center", marginBottom: 20 }}>
+                Fill in the details to register your account.
+            </Text>
+            <Form
+                            form={form}
+                            layout="vertical"
+                            onFinish={handleRegister}
+                            style={{ width: "100%" }}
+                        >
+                            <Form.Item
+                                label="Full Name"
+                                name="name"
+                                rules={[{ required: true, message: "Please enter your name!" }]}
+                            >
+                                <Input placeholder="Enter your full name" />
+                            </Form.Item>
 
-        <Divider>
-          <Text type="secondary">Already have an account?</Text>
-        </Divider>
+                            <Form.Item
+                                label="User Name"
+                                name="username"
+                                rules={[{ required: true, message: "Please enter your name!" }]}
+                            >
+                                <Input placeholder="Enter your full name" />
+                            </Form.Item>
 
-        <div className="text-center">
-          <Link to="/">
-            <Button type="link" className="text-base">
-              Sign in to your account
-            </Button>
-          </Link>
-        </div>
-      </Card>
-    </div>
-  );
-}
+                            <Form.Item
+                                label="Email"
+                                name="email"
+                                rules={[
+                                    { required: true, message: "Please enter your email!" },
+                                    { type: "email", message: "Invalid email format!" },
+                                ]}
+                            >
+                                <Input placeholder="Enter your email" />
+                            </Form.Item>
+
+                            <Form.Item
+                                label="Password"
+                                name="password"
+                                rules={[
+                                    { required: true, message: "Please enter your password!" },
+                                    { min: 6, message: "Password must be at least 6 characters!" },
+                                ]}
+                            >
+                                <Input.Password placeholder="Enter your password" />
+                            </Form.Item>
+
+
+                <Form.Item>
+                    <Button type="primary" htmlType="submit" loading={loading} block>
+                        Register
+                    </Button>
+                </Form.Item>
+
+                <Text type="secondary" style={{ display: "block", textAlign: "center" }}>
+                    Already a member? <a href="/">Sign in</a>
+                </Text>
+            </Form>
+        </Col>
+    </Row>
+</div>
+</div>
+    );
+};
 
 export default RegisterPage;

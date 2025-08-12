@@ -15,3 +15,112 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Custom styles for Ant Design components to match dark theme */
+.create-task-modal .ant-modal-content {
+  background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+  border: 1px solid #4b5563;
+  border-radius: 16px;
+}
+
+.create-task-modal .ant-modal-header {
+  background: transparent;
+  border-bottom: 1px solid #4b5563;
+  padding: 20px 24px;
+}
+
+.create-task-modal .ant-modal-title {
+  color: white !important;
+}
+
+.create-task-modal .ant-modal-close {
+  color: #9ca3af;
+}
+
+.create-task-modal .ant-modal-close:hover {
+  color: white;
+}
+
+.create-task-modal .ant-form-item-label > label {
+  color: #e5e7eb !important;
+  font-weight: 500;
+}
+
+.create-task-modal .ant-input,
+.create-task-modal .ant-input-affix-wrapper,
+.create-task-modal .ant-select-selector,
+.create-task-modal .ant-picker {
+  background: #374151 !important;
+  border: 1px solid #4b5563 !important;
+  color: white !important;
+  border-radius: 8px !important;
+}
+
+.create-task-modal .ant-input::placeholder,
+.create-task-modal .ant-input-affix-wrapper::placeholder {
+  color: #9ca3af !important;
+}
+
+.create-task-modal .ant-input:hover,
+.create-task-modal .ant-input-affix-wrapper:hover,
+.create-task-modal .ant-select-selector:hover,
+.create-task-modal .ant-picker:hover {
+  border-color: #60a5fa !important;
+}
+
+.create-task-modal .ant-input:focus,
+.create-task-modal .ant-input-affix-wrapper:focus,
+.create-task-modal .ant-select-selector:focus,
+.create-task-modal .ant-picker:focus {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+}
+
+.create-task-modal .ant-select-selection-item {
+  color: white !important;
+}
+
+.create-task-modal .ant-picker-input > input {
+  color: white !important;
+}
+
+.create-task-modal .ant-picker-input > input::placeholder {
+  color: #9ca3af !important;
+}
+
+.create-task-modal .ant-btn {
+  border-radius: 8px;
+  font-weight: 500;
+  height: 40px;
+  padding: 0 24px;
+}
+
+.create-task-modal .ant-btn-default {
+  background: #4b5563;
+  border-color: #6b7280;
+  color: #e5e7eb;
+}
+
+.create-task-modal .ant-btn-default:hover {
+  background: #6b7280;
+  border-color: #9ca3af;
+  color: white;
+}
+
+.create-task-modal .ant-btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border: none;
+  color: white;
+}
+
+.create-task-modal .ant-btn-primary:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.create-task-modal .ant-form-item-explain-error {
+  color: #f87171 !important;
+  font-size: 12px;
+  margin-top: 4px;
+}

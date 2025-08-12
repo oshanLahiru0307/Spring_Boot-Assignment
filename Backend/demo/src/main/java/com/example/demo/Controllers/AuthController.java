@@ -1,19 +1,20 @@
 package com.example.demo.Controllers;
 
 import com.example.demo.DTO.LoginRequest;
+import com.example.demo.DTO.LoginResponse;
 import com.example.demo.DTO.RegisterRequest;
 import com.example.demo.Services.JWTService;
 import com.example.demo.Services.UserServices;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 
 @RestController
 @RequestMapping(value = "/auth")
+@CrossOrigin
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -33,11 +34,19 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<HashMap<String, String>> login(@RequestBody LoginRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
-        return ResponseEntity.ok(jwtUtil.getJWTToken(request.getUsername()));
+        
+        String token = jwtUtil.getJWTToken(request.getUsername());
+        String user = request.getUsername();
+        String email = userService.findUserByUsername(user).getEmail();
+        HashMap<String,String> res = new HashMap<String, String>();
+        res.put("token", token);
+        res.put("username", user);
+        res.put("email", email);
+        return ResponseEntity.ok(res);
     }
 
 }

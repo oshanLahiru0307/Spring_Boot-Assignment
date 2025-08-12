@@ -9,8 +9,10 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+
 @RestController
-@RequestMapping(value = "/api/tasks")
+@RequestMapping(value = "/api/task")
+@CrossOrigin
 public class TaskController {
 
     @Autowired
@@ -38,7 +40,8 @@ public class TaskController {
         return ResponseEntity.ok(tasks);
     }
 
-    @PostMapping("/create")
+
+    @PostMapping("/createTask")
     public ResponseEntity<TaskEntity> create(@RequestBody TaskEntity taskEntity) {
         TaskEntity task = taskService.save(taskEntity);
         return ResponseEntity.ok(task);
@@ -63,6 +66,5 @@ public class TaskController {
             return ResponseEntity.status(404).body(null);
         }
     }
-
 
 }
