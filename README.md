@@ -30,7 +30,6 @@ A modern, full-stack task management application built with React and Spring Boo
 - 🔍 **Advanced Filtering** - Search, filter, and sort tasks by various criteria
 - 📱 **Responsive Design** - Works perfectly on desktop and mobile devices
 - ⚡ **Real-time Updates** - Instant UI updates without page refresh
-- 🎯 **Bulk Operations** - Select and manage multiple tasks at once
 
 ## 🛠️ Technology Stack
 
@@ -40,7 +39,6 @@ A modern, full-stack task management application built with React and Spring Boo
 - **Tailwind CSS 3.4.17** - Utility-first CSS framework for rapid UI development
 - **Axios 1.11.0** - Promise-based HTTP client for API communication
 - **React Router DOM 7.8.0** - Declarative routing for React applications
-- **Redux Toolkit 2.8.2** - State management (configured but not actively used)
 
 ### Backend
 - **Spring Boot 3.4.8** - Java-based framework for building web applications
