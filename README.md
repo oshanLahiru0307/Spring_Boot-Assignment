@@ -302,6 +302,3 @@ task-management-app/
 - **Tailwind CSS** for the utility-first styling approach
 - **JWT** for secure authentication implementation
 
----
-
-**Made with ❤️ by the Task Management Team**
