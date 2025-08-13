@@ -19,19 +19,27 @@ static async  registerUser(userData) {
 static async loginUser(credentials) {
         try {
             const response = await axios.post(`${base_uri}/login`, credentials)
-            if (response) {
+            if (response && response.data) {
                 
                 const { token, username } = response.data;
                 
-                // Store token and user separately
+                // Store token and user synchronously
                 localStorage.setItem('token', token);
                 localStorage.setItem('user', username);
                 
+                // Verify the data was stored
+                const storedToken = localStorage.getItem('token');
+                const storedUser = localStorage.getItem('user');
+                
+                if (!storedToken || !storedUser) {
+                    throw new Error('Failed to store authentication data');
+                }
+                
                 console.log("Login successful:", response.data);
-                console.log("Token:", response.data.token);
-                console.log("User:", response.data.username);
+                console.log("Token stored:", storedToken);
+                console.log("User stored:", storedUser);
             } else {
-                throw new Error('Login failed');
+                throw new Error('Login failed - invalid response');
             }
             return response.data;
         }catch(error) {
