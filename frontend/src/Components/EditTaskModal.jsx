@@ -3,6 +3,7 @@ import { Modal, Form, Input, Select, DatePicker, Button, message } from 'antd';
 import { EditOutlined, SaveOutlined } from '@ant-design/icons';
 import TaskService from '../Services/TaskServices';
 import dayjs from 'dayjs';
+import AuthService from '../Services/AuthService'; 
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -10,6 +11,7 @@ const { Option } = Select;
 const EditTaskModal = ({ visible, task, onCancel, onSuccess }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const user = AuthService.getUser();
 
   useEffect(() => {
     if (visible && task) {
@@ -31,7 +33,7 @@ const EditTaskModal = ({ visible, task, onCancel, onSuccess }) => {
       // Format the date for backend
       const formattedValues = {
         id: task.id,
-        username: task.username,
+        username: user,
         ...values,
         dueDate: values.dueDate ? values.dueDate.format('YYYY-MM-DD') : null,
       };
