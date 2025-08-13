@@ -6,17 +6,19 @@ import NavBar from '../Components/NavBar';
 import CreateTaskModal from '../Components/CreateTaskModal';
 import TaskAnalytics from '../Components/TaskAnalytics';
 import TaskService from '../Services/TaskServices';
+import AuthService from '../Services/AuthService'; 
 
 function Dashbord() {
   const navigate = useNavigate();
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
+  const user = AuthService.getUser();
 
   const fetchTasks = async () => {
     try {
       setLoading(true);
-      const response = await TaskService.getAllTasks();
+      const response = await TaskService.getByUserName(user);
       if (response) {
         setTasks(response);
       }

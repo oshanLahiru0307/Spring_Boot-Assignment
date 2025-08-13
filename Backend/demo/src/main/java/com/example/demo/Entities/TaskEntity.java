@@ -21,6 +21,7 @@ public class TaskEntity {
     private String status;
     private String priority;
     private String dueDate;
+    private String assignedTo;
 
     public int getId() {
         return id;
@@ -78,4 +79,11 @@ public class TaskEntity {
         this.dueDate = dueDate;
     }
 
+    public String getAssignedTo() {
+        return assignedTo;
+    }
+
+    public void setAssignedTo(String assignedTo) {
+        this.assignedTo = assignedTo;
+    }
 }

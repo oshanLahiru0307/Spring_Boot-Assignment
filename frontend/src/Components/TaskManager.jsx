@@ -80,7 +80,7 @@ const TaskManager = ({
 
   const handleBulkDelete = async () => {
     if (selectedTasks.length === 0) {
-      message.warning('Please select tasks to delete');
+      message.error('Please select tasks to delete');
       return;
     }
 
@@ -327,7 +327,7 @@ const TaskManager = ({
                   onChange={() => handleSelectTask(task.id)}
                   className="rounded border-gray-400 text-blue-600 focus:ring-blue-500"
                 />
-                <h3 className="text-lg font-semibold text-white">{task.title}</h3>
+                <h3 className="text-lg font-semibold text-white">{task.taskName}</h3>
               </div>
               
               <Dropdown

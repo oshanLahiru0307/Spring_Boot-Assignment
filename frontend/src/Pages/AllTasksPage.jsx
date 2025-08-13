@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, message, Popconfirm } from 'antd';
+import { Button, message } from 'antd';
 import { PlusOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import NavBar from '../Components/NavBar';
 import TaskManager from '../Components/TaskManager';
@@ -83,7 +83,7 @@ function AllTasksPage() {
 
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [tasks.length]);
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-20 px-4'>
