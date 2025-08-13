@@ -33,7 +33,7 @@ const EditTaskModal = ({ visible, task, onCancel, onSuccess }) => {
       // Format the date for backend
       const formattedValues = {
         id: task.id,
-        username: user,
+        userName: user,
         ...values,
         dueDate: values.dueDate ? values.dueDate.format('YYYY-MM-DD') : null,
       };
