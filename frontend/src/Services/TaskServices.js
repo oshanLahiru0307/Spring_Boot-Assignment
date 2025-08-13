@@ -7,7 +7,6 @@ console.log("token", token)
 class TaskService {
 
   static async createTask(taskData) {
-    const token = localStorage.getItem('token');
     try {
       if (!token) {
         throw new Error('Authentication token not found. Please login again.');

@@ -13,14 +13,27 @@ function Dashbord() {
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
-  const user = AuthService.getUser();
 
   const fetchTasks = async () => {
     try {
       setLoading(true);
+      const user = localStorage.getItem('user');
+      
+      // Check if user is authenticated
+      if (!user) {
+        console.error('No user found in localStorage');
+        message.error('Please login to view tasks');
+        navigate('/login');
+        return;
+      }
+      
+      console.log("Fetching tasks for user:", user);
       const response = await TaskService.getByUserName(user);
       if (response) {
         setTasks(response);
+      } else {
+        console.error('Failed to fetch tasks');
+        message.error('Failed to fetch tasks');
       }
     } catch (error) {
       console.error('Error fetching tasks:', error);
@@ -40,7 +53,19 @@ function Dashbord() {
   };
 
   useEffect(() => {
-    fetchTasks();
+    // Check if user is authenticated before fetching tasks
+    const user = localStorage.getItem('user');
+    if (user) {
+      // Add a small delay to ensure everything is properly initialized
+      const timer = setTimeout(() => {
+        fetchTasks();
+      }, 50);
+      
+      return () => clearTimeout(timer);
+    } else {
+      console.log('No user found, redirecting to login');
+      navigate('/login');
+    }
   }, []);
 
   const totalTasks = tasks.length;

@@ -17,11 +17,20 @@ function AllTasksPage() {
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
-  const userName = localStorage.getItem('user');
 
   const fetchTasks = async () => {
     try {
       setLoading(true);
+      const userName = localStorage.getItem('user');
+      
+      // Check if user is authenticated
+      if (!userName) {
+        console.error('No user found in localStorage');
+        message.error('Please login to view tasks');
+        navigate('/login');
+        return;
+      }
+      
       console.log("Fetching tasks for user:", userName);
       const response = await TaskService.getByUserName(userName);
       if (response) {
@@ -60,7 +69,8 @@ function AllTasksPage() {
   const handleDeleteTask = async (taskId) => {
     try {
       await TaskService.deleteTask(taskId);
-      await fetchTasks(); // Refresh the task list
+      const data = await fetchTasks(); // Refresh the task list
+      console.log(data);
       message.success('Task deleted successfully!');
     } catch (error) {
       console.error('Error deleting task:', error);
@@ -82,8 +92,15 @@ function AllTasksPage() {
   };
 
   useEffect(() => {
-    fetchTasks();
-  }, [tasks.length]);
+    // Check if user is authenticated before fetching tasks
+    const userName = localStorage.getItem('user');
+    if (userName) {
+      fetchTasks();
+    } else {
+      console.log('No user found, redirecting to login');
+      navigate('/login');
+    }
+  }, []); // Remove tasks.length dependency to prevent infinite loops
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-20 px-4'>

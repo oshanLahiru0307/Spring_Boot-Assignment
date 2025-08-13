@@ -17,7 +17,7 @@ const RegisterPage= () => {
             const response = await AuthService.registerUser(values);
             setLoading(false)
             console.log(response)
-            navigate('/login')
+            navigate('/')
         } catch (error) {
             console.error(error)
             message.error("Failed to Register User. Try again later!")
