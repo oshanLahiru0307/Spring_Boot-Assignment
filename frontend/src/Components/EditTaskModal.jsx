@@ -27,9 +27,11 @@ const EditTaskModal = ({ visible, task, onCancel, onSuccess }) => {
   const handleSubmit = async (values) => {
     try {
       setLoading(true);
-      
+      console.log("Submitting form with values:", values);
       // Format the date for backend
       const formattedValues = {
+        id: task.id,
+        username: task.username,
         ...values,
         dueDate: values.dueDate ? values.dueDate.format('YYYY-MM-DD') : null,
       };

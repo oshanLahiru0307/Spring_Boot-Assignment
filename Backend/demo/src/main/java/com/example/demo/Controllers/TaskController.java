@@ -58,7 +58,7 @@ public class TaskController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<TaskEntity> update(@RequestBody TaskEntity taskEntity) {
+    public ResponseEntity<TaskEntity> update(@RequestBody TaskEntity taskEntity, @PathVariable int id) {
         try {
             TaskEntity updatedTask = taskService.updateTask(taskEntity);
             return ResponseEntity.ok(updatedTask);

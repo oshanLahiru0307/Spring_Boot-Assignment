@@ -112,7 +112,7 @@ const CreateTaskModal = ({ visible, onCancel, onSuccess }) => {
           />
         </Form.Item>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           <Form.Item
             name="priority"
             label="Priority"
@@ -150,6 +150,23 @@ const CreateTaskModal = ({ visible, onCancel, onSuccess }) => {
               placeholder="Select due date"
             />
           </Form.Item>
+
+          <Form.Item
+          name="assignedTo"
+          label="Assigned To"
+          rules={[
+            { required: true, message: 'Please enter Assigned To' },
+            { min: 3, message: 'Title must be at least 3 characters' },
+            { max: 20, message: 'Title cannot exceed 100 characters' }
+          ]}
+        >
+          <Input 
+            placeholder="Enter Assigned To" 
+            size="large"
+            className="rounded-lg"
+          />
+        </Form.Item>
+
         </div>
 
         <Form.Item className="mb-0">

@@ -41,11 +41,16 @@ public class TaskService {
 
     public TaskEntity updateTask(TaskEntity taskEntity) {
         int taskId = taskEntity.getId();
+        System.out.println(taskId);
         TaskEntity optionalTask = taskRepository.findById(taskId).orElse(null);
         if (optionalTask != null) {
             optionalTask.setTaskName(taskEntity.getTaskName());
             optionalTask.setDescription(taskEntity.getDescription());
             optionalTask.setUserName(taskEntity.getUserName());
+            optionalTask.setStatus(taskEntity.getStatus());
+            optionalTask.setPriority(taskEntity.getPriority());
+            optionalTask.setDueDate(taskEntity.getDueDate());
+            optionalTask.setAssignedTo(taskEntity.getAssignedTo());
             taskRepository.save(optionalTask);
             return optionalTask;
         } else {

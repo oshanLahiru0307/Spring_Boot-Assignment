@@ -80,7 +80,7 @@ const TaskManager = ({
 
   const handleBulkDelete = async () => {
     if (selectedTasks.length === 0) {
-      message.warning('Please select tasks to delete');
+      message.error('Please select tasks to delete');
       return;
     }
 

@@ -106,7 +106,6 @@ class TaskService {
 
   static async getByUserName(userName) {
     try {
-      const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('Authentication token not found. Please login again.');
       }
