@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Modal, Form, Input, Select, DatePicker, Button, message } from 'antd';
+import { Modal, Form, Input, Select, DatePicker, Button } from 'antd';
+import { useSnackbar } from 'notistack';
 import { PlusOutlined, SaveOutlined } from '@ant-design/icons';
-import TaskService from '../Services/TaskServices';
-import AuthService from '../Services/AuthService'; 
+import { useSnapshot } from 'valtio';
+import { taskStore, taskActions } from '../Stores/taskStore';
+import { authStore } from '../Stores/authStore'; 
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -10,43 +12,37 @@ const { Option } = Select;
 const CreateTaskModal = ({ visible, onCancel, onSuccess }) => {
 
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
+  const { loading } = useSnapshot(taskStore);
+  const { user } = useSnapshot(authStore);
 
   const handleSubmit = async (values) => {
     try {
-      setLoading(true);
-      const user = AuthService.getUser();
       if (!user) {
-        // Handle case where user is not logged in
-        message.error('You must be logged in to create a task.');
+        enqueueSnackbar('You must be logged in to create a task.', { variant: 'error' });
         return;
       }
+      
       // Format the date for backend
       const formattedValues = {
         ...values,
         userName: user,
         dueDate: values.dueDate ? values.dueDate.format('YYYY-MM-DD') : null,
-        status: values.status || 'Pending', // Use form status or default to Pending
+        status: values.status || 'Pending',
       };
 
       console.log("Form values:", formattedValues);
 
-      // Make API call to create task using TaskService
-      const newTask = await TaskService.createTask(formattedValues);
+      // Make API call to create task using Valtio
+      const newTask = await taskActions.createTask(formattedValues);
       
-      message.success('Task created successfully!');
+      enqueueSnackbar('Task created successfully!', { variant: 'success' });
       form.resetFields();
       onSuccess(newTask); // Pass the new task data back
       onCancel(); // Close the modal
     } catch (error) {
       console.error('Error creating task:', error);
-      if (error.response) {
-          message.error(`Error: ${error.response.data?.message || 'Failed to create task'}`);
-      } else {
-        message.error(`Error: ${error.message || 'An unexpected error occurred.'}`);
-      }
-    } finally {
-      setLoading(false);
+      enqueueSnackbar(error || 'An unexpected error occurred.', { variant: 'error' });
     }
   };
 

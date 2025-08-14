@@ -1,13 +1,11 @@
 import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:5000/api/task';
-const token = localStorage.getItem('token');
-
-console.log("token", token)
 class TaskService {
 
   static async createTask(taskData) {
     try {
+      const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('Authentication token not found. Please login again.');
       }
@@ -53,6 +51,7 @@ class TaskService {
 
   static async getTaskById(taskId) {
     try {
+      const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('Authentication token not found. Please login again.');
       }
@@ -70,6 +69,7 @@ class TaskService {
 
   static async updateTask(taskId, taskData) {
     try {
+      const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('Authentication token not found. Please login again.');
       }
@@ -87,6 +87,7 @@ class TaskService {
 
   static async deleteTask(taskId) {
     try {
+      const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('Authentication token not found. Please login again.');
       }
@@ -105,6 +106,7 @@ class TaskService {
 
   static async getByUserName(userName) {
     try {
+      const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('Authentication token not found. Please login again.');
       }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Select, Input, Button, Dropdown, Space, message, Popconfirm } from 'antd';
+import { Select, Input, Button, Dropdown, Space, Popconfirm } from 'antd';
+import { useSnackbar } from 'notistack';
 import { 
   SearchOutlined, 
   FilterOutlined, 
@@ -10,14 +11,14 @@ import {
   MoreOutlined,
   ReloadOutlined
 } from '@ant-design/icons';
-import TaskService from '../Services/TaskServices';
+import { useSnapshot } from 'valtio';
+import { taskStore, taskActions } from '../Stores/taskStore';
 
 const { Option } = Select;
 const { Search } = Input;
 
 const TaskManager = ({ 
   tasks, 
-  setTasks, 
   onEditTask, 
   onViewTask, 
   onDeleteTask, 
@@ -29,7 +30,8 @@ const TaskManager = ({
   const [priorityFilter, setPriorityFilter] = useState('all');
   const [sortBy, setSortBy] = useState('dueDate');
   const [sortOrder, setSortOrder] = useState('asc');
-  const [selectedTasks, setSelectedTasks] = useState([]);
+  const { enqueueSnackbar } = useSnackbar();
+  const { selectedTasks } = useSnapshot(taskStore);
 
   // Filter and sort tasks
   const filteredAndSortedTasks = tasks
@@ -80,58 +82,41 @@ const TaskManager = ({
 
   const handleBulkDelete = async () => {
     if (selectedTasks.length === 0) {
-      message.error('Please select tasks to delete');
+      enqueueSnackbar('Please select tasks to delete', { variant: 'error' });
       return;
     }
 
     try {
-      const deletePromises = selectedTasks.map(taskId => TaskService.deleteTask(taskId));
-      await Promise.all(deletePromises);
-      
-      message.success(`Successfully deleted ${selectedTasks.length} task(s)`);
-      setSelectedTasks([]);
-      onRefresh();
+      await taskActions.bulkDeleteTasks(selectedTasks);
+      enqueueSnackbar(`Successfully deleted ${selectedTasks.length} task(s)`, { variant: 'success' });
     } catch (error) {
       console.error('Error deleting tasks:', error);
-      message.error('Failed to delete some tasks');
+      enqueueSnackbar('Failed to delete some tasks', { variant: 'error' });
     }
   };
 
   const handleBulkStatusUpdate = async (newStatus) => {
     if (selectedTasks.length === 0) {
-      message.warning('Please select tasks to update');
+      enqueueSnackbar('Please select tasks to update', { variant: 'warning' });
       return;
     }
 
     try {
-      const updatePromises = selectedTasks.map(taskId => 
-        TaskService.updateTask(taskId, { status: newStatus })
-      );
-      await Promise.all(updatePromises);
-      
-      message.success(`Successfully updated ${selectedTasks.length} task(s) to ${newStatus}`);
-      setSelectedTasks([]);
-      onRefresh();
+      await taskActions.bulkUpdateTaskStatus(selectedTasks, newStatus);
+      enqueueSnackbar(`Successfully updated ${selectedTasks.length} task(s) to ${newStatus}`, { variant: 'success' });
     } catch (error) {
       console.error('Error updating tasks:', error);
-      message.error('Failed to update some tasks');
+      enqueueSnackbar('Failed to update some tasks', { variant: 'error' });
     }
   };
 
   const handleSelectAll = () => {
-    if (selectedTasks.length === filteredAndSortedTasks.length) {
-      setSelectedTasks([]);
-    } else {
-      setSelectedTasks(filteredAndSortedTasks.map(task => task.id));
-    }
+    const allTaskIds = filteredAndSortedTasks.map(task => task.id);
+    taskActions.selectAllTasks(allTaskIds);
   };
 
   const handleSelectTask = (taskId) => {
-    if (selectedTasks.includes(taskId)) {
-      setSelectedTasks(selectedTasks.filter(id => id !== taskId));
-    } else {
-      setSelectedTasks([...selectedTasks, taskId]);
-    }
+    taskActions.toggleTaskSelection(taskId);
   };
 
   const clearFilters = () => {
@@ -140,7 +125,7 @@ const TaskManager = ({
     setPriorityFilter('all');
     setSortBy('dueDate');
     setSortOrder('asc');
-    setSelectedTasks([]);
+    taskActions.clearSelectedTasks();
   };
 
   const getStatusColor = (status) => {

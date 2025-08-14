@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Form, Input, Select, DatePicker, Button, message } from 'antd';
+import { Modal, Form, Input, Select, DatePicker, Button } from 'antd';
+import { useSnackbar } from 'notistack';
 import { EditOutlined, SaveOutlined } from '@ant-design/icons';
-import TaskService from '../Services/TaskServices';
 import dayjs from 'dayjs';
-import AuthService from '../Services/AuthService'; 
+import { useSnapshot } from 'valtio';
+import { taskStore, taskActions } from '../Stores/taskStore';
+import { authStore } from '../Stores/authStore'; 
 
 const { TextArea } = Input;
 const { Option } = Select;
 
 const EditTaskModal = ({ visible, task, onCancel, onSuccess }) => {
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
-  const user = AuthService.getUser();
+  const { enqueueSnackbar } = useSnackbar();
+  const { loading } = useSnapshot(taskStore);
+  const { user } = useSnapshot(authStore);
 
   useEffect(() => {
     if (visible && task) {
@@ -28,7 +31,6 @@ const EditTaskModal = ({ visible, task, onCancel, onSuccess }) => {
 
   const handleSubmit = async (values) => {
     try {
-      setLoading(true);
       console.log("Submitting form with values:", values);
       // Format the date for backend
       const formattedValues = {
@@ -40,21 +42,15 @@ const EditTaskModal = ({ visible, task, onCancel, onSuccess }) => {
 
       console.log("Form values:", formattedValues);
 
-      // Make API call to update task using TaskService
-      const updatedTask = await TaskService.updateTask(task.id, formattedValues);
+      // Make API call to update task using Valtio
+      const result = await taskActions.updateTask(task.id, formattedValues);
       
-      message.success('Task updated successfully!');
-      onSuccess(updatedTask); // Pass the updated task data back
+      enqueueSnackbar('Task updated successfully!', { variant: 'success' });
+      onSuccess(result); // Pass the updated task data back
       onCancel(); // Close the modal
     } catch (error) {
       console.error('Error updating task:', error);
-      if (error.response) {
-        message.error(`Error: ${error.response.data?.message || 'Failed to update task'}`);
-      } else {
-        message.error(`Error: ${error.message || 'An unexpected error occurred.'}`);
-      }
-    } finally {
-      setLoading(false);
+      enqueueSnackbar(error || 'An unexpected error occurred.', { variant: 'error' });
     }
   };
 

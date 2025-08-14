@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {useNavigate } from "react-router-dom";
-import { Form, Button, Input, Typography, message, Row, Col } from "antd";
-import AuthService from "../Services/AuthService"
+import { Form, Button, Input, Typography, Row, Col } from "antd";
+import { useSnackbar } from 'notistack';
 import backImage2 from "../assets/backImage2.jpg"
+import { useSnapshot } from 'valtio';
+import { authStore, authActions } from '../Stores/authStore';
 
 const { Title, Text } = Typography;
 
@@ -10,30 +12,37 @@ const LoginPage = () => {
 
   const navigate = useNavigate();
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
+  const { loading, error, isAuthenticated } = useSnapshot(authStore);
 
 
   const handleSubmit = async (values) => {
-    setLoading(true);
     try {
       console.log("Form values:", values);
-      const response = await AuthService.loginUser(values);
-      console.log("Login response:", response); // Debugging line
-      if (response) {
-        //state.userId = response.id;
-        //localStorage.setItem("user", JSON.stringify(state.userId));
-        message.success("Login successful!");
-        navigate("/dashboard"); 
-      } else {
-        message.error("Login failed. Please check your credentials....");
-      }
+      const result = await authActions.loginUser(values);
+      console.log("Login response:", result);
+      enqueueSnackbar("Login successful!", { variant: 'success' });
+      navigate("/dashboard");
     } catch (error) {
       console.error("Login error:", error);
-      message.error("An error occurred during login. Please try again.");
-    } finally {
-      setLoading(false);
+      enqueueSnackbar(error || "An error occurred during login. Please try again.", { variant: 'error' });
     }
   }
+
+  // Handle authentication success
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Handle error display
+  useEffect(() => {
+    if (error) {
+      enqueueSnackbar(error, { variant: 'error' });
+      authActions.clearError();
+    }
+  }, [error, enqueueSnackbar]);
 
 
   return (
@@ -151,3 +160,4 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
