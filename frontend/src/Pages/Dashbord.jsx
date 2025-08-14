@@ -1,72 +1,75 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, message } from 'antd';
+import { Button } from 'antd';
+import { useSnackbar } from 'notistack';
 import { PlusOutlined, ArrowRightOutlined } from '@ant-design/icons';
 import NavBar from '../Components/NavBar';
 import CreateTaskModal from '../Components/CreateTaskModal';
 import TaskAnalytics from '../Components/TaskAnalytics';
-import TaskService from '../Services/TaskServices';
-import AuthService from '../Services/AuthService'; 
+import { useSnapshot } from 'valtio';
+import { taskStore, taskActions } from '../Stores/taskStore';
+import { authStore, authActions } from '../Stores/authStore'; 
 
 function Dashbord() {
   const navigate = useNavigate();
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false);
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
+  const { tasks, loading, error } = useSnapshot(taskStore);
+  const { user, isAuthenticated } = useSnapshot(authStore);
 
-  const fetchTasks = async () => {
+  const loadTasks = async () => {
     try {
-      setLoading(true);
-      const user = localStorage.getItem('user');
-      
-      // Check if user is authenticated
       if (!user) {
-        console.error('No user found in localStorage');
-        message.error('Please login to view tasks');
-        navigate('/login');
+        console.error('No user found');
+        enqueueSnackbar('Please login to view tasks', { variant: 'error' });
+        navigate('/');
         return;
       }
       
       console.log("Fetching tasks for user:", user);
-      const response = await TaskService.getByUserName(user);
-      if (response) {
-        setTasks(response);
-      } else {
-        console.error('Failed to fetch tasks');
-        message.error('Failed to fetch tasks');
-      }
+      await taskActions.fetchTasks(user);
     } catch (error) {
       console.error('Error fetching tasks:', error);
-      message.error('Error fetching tasks. Please try again.');
-    } finally {
-      setLoading(false);
+      enqueueSnackbar('Error fetching tasks. Please try again.', { variant: 'error' });
     }
   };
 
   const handleCreateTaskSuccess = async (newTask) => {
     try {
-      await fetchTasks(); // Refresh the task list
-      message.success('Task created successfully!');
+      await loadTasks(); // Refresh the task list
+      enqueueSnackbar('Task created successfully!', { variant: 'success' });
     } catch (error) {
       console.error('Error creating task:', error);
     }
   };
 
   useEffect(() => {
-    // Check if user is authenticated before fetching tasks
-    const user = localStorage.getItem('user');
-    if (user) {
-      // Add a small delay to ensure everything is properly initialized
-      const timer = setTimeout(() => {
-        fetchTasks();
-      }, 50);
-      
-      return () => clearTimeout(timer);
-    } else {
-      console.log('No user found, redirecting to login');
-      navigate('/login');
+    // Check authentication status and load tasks
+    const initializeApp = async () => {
+      try {
+        await authActions.checkAuthStatus();
+        if (isAuthenticated && user) {
+          await loadTasks();
+        } else {
+          console.log('Not authenticated, redirecting to login');
+          navigate('/');
+        }
+      } catch (error) {
+        console.log('Authentication check failed, redirecting to login');
+        navigate('/');
+      }
+    };
+
+    initializeApp();
+  }, [isAuthenticated, user, navigate]);
+
+  // Handle error display
+  useEffect(() => {
+    if (error) {
+      enqueueSnackbar(error, { variant: 'error' });
+      taskActions.clearError();
     }
-  }, []);
+  }, [error, enqueueSnackbar]);
 
   const totalTasks = tasks.length;
   const completedTasks = tasks.filter(task => task.status === 'Completed').length;

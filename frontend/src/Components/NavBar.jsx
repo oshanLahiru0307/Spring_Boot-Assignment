@@ -1,22 +1,27 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/newlogo.png';
+import { useSnapshot } from 'valtio';
+import { authStore, authActions } from '../Stores/authStore';
 
 
 const NavBar = () => {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const username = localStorage.getItem('user')
+  const { user } = useSnapshot(authStore);
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      await authActions.logoutUser();
+      navigate('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   const getUserInitial = () => {
-    if (username) {
-      return username.charAt(0).toUpperCase();
+    if (user) {
+      return user.charAt(0).toUpperCase();
     }
     return 'U';
   };
@@ -67,7 +72,7 @@ const NavBar = () => {
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-gradient-to-b from-gray-800 to-gray-900 rounded-lg shadow-2xl py-1 z-50 border border-gray-700">
                   <div className="px-4 py-3 text-sm text-gray-300 border-b border-gray-700">
-                    <p className="font-medium text-white">{username || 'User'}</p>
+                    <p className="font-medium text-white">{user || 'User'}</p>
                   </div>
                   <button
                     onClick={() => {

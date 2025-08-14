@@ -2,8 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import RegisterPage from '../src/Pages/RegisterPage';
 import Dashbord from '../src/Pages/Dashbord';
-import LoginPage from '../src/Pages/LoginPage';
-import Sample from './Pages/Sample'
+import LoginPage from '../src/Pages/Loginpage';
 import AllTasksPage from '../src/Pages/AllTasksPage';
 
 function App() {
@@ -14,7 +13,6 @@ function App() {
         <Routes>
           <Route path="/" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/tasks" element={<Sample />} />
           <Route 
             path="/dashboard" 
             element={

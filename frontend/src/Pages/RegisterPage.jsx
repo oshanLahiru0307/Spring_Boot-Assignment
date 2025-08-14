@@ -1,28 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {useNavigate} from 'react-router-dom'
-import { Form, Button, Input, Typography, Row, Col, message} from "antd";
-import AuthService from "../Services/AuthService"
+import { Form, Button, Input, Typography, Row, Col } from "antd";
+import { useSnackbar } from 'notistack';
 import backImage2 from "../assets/backImage2.jpg"
+import { useSnapshot } from 'valtio';
+import { authStore, authActions } from '../Stores/authStore';
 
 const { Title, Text } = Typography;
 
 const RegisterPage= () => {
     const navigate = useNavigate()
     const [form] = Form.useForm();
-    const [loading, setLoading] = useState(false)
+    const { enqueueSnackbar } = useSnackbar();
+    const { loading, error } = useSnapshot(authStore);
 
     const handleRegister = async (values) => {
         try {
-            setLoading(true)
-            const response = await AuthService.registerUser(values);
-            setLoading(false)
-            console.log(response)
-            navigate('/')
+            const result = await authActions.registerUser(values);
+            console.log(result);
+            enqueueSnackbar("Registration successful! Please login.", { variant: 'success' });
+            navigate('/');
         } catch (error) {
-            console.error(error)
-            message.error("Failed to Register User. Try again later!")
+            console.error(error);
+            enqueueSnackbar(error || "Failed to Register User. Try again later!", { variant: 'error' });
+            authActions.clearError();
         }
     };
+
+    // Handle error display
+    useEffect(() => {
+        if (error) {
+            enqueueSnackbar(error, { variant: 'error' });
+            authActions.clearError();
+        }
+    }, [error, enqueueSnackbar]);
 
     return (
 
